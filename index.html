@@ -20,6 +20,9 @@
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
 
+  <link rel="icon" type="image/png" href="img/icon.png" />
+  <link rel="apple-touch-icon" href="img/icon.png" />
+
   <!-- Replace origin with your deployed URL (e.g. GitHub Pages or custom domain). -->
   <link rel="canonical" href="https://ndawinata.github.io/ebyte-config-tool/" />
   <meta property="og:locale" content="en_US" />
@@ -33,10 +36,10 @@
   />
   <meta
     property="og:image"
-    content="https://placehold.co/1200x630/1d1d1f/0a84ff/png?text=RF+Setting+Ebyte"
+    content="https://ndawinata.github.io/ebyte-config-tool/img/icon.png"
   />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
+  <meta property="og:image:width" content="2048" />
+  <meta property="og:image:height" content="2048" />
   <meta property="og:image:alt" content="RF Setting Ebyte — E22 module configuration in the browser" />
 
   <meta name="twitter:card" content="summary_large_image" />
@@ -47,7 +50,7 @@
   />
   <meta
     name="twitter:image"
-    content="https://placehold.co/1200x630/1d1d1f/0a84ff/png?text=RF+Setting+Ebyte"
+    content="https://ndawinata.github.io/ebyte-config-tool/img/icon.png"
   />
 
   <script type="application/ld+json">
@@ -62,7 +65,8 @@
     "browserRequirements": "Requires Web Serial API (Chrome, Edge, Opera, Brave)",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "inLanguage": "en",
-    "url": "https://ndawinata.github.io/ebyte-config-tool/"
+    "url": "https://ndawinata.github.io/ebyte-config-tool/",
+    "license": "https://www.apache.org/licenses/LICENSE-2.0"
   }
   </script>
 
@@ -74,10 +78,14 @@
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">
-          <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="1.75"/>
-            <path d="M16 4v4M16 24v4M4 16h4M24 16h4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-          </svg>
+          <img
+            class="brand-mark-img"
+            src="img/icon1.png"
+            width="40"
+            height="40"
+            alt=""
+            decoding="async"
+          />
         </div>
         <div class="brand-text">
           <div class="brand-title">RF Setting <span class="brand-sep">·</span> <span class="accent">Ebyte</span></div>
@@ -140,6 +148,7 @@
       <button class="tab tab-active" data-tab="local">Local Configuration</button>
       <button class="tab"            data-tab="remote">Remote Configuration</button>
       <button class="tab"            data-tab="download">Download mode</button>
+      <button class="tab"            data-tab="multi">Multi-device terminal</button>
       <button class="tab"            data-tab="help">Help</button>
     </nav>
 
@@ -320,6 +329,29 @@
         </div>
       </section>
 
+      <!-- ============== TAB: MULTI-DEVICE TERMINAL ============== -->
+      <section class="card tab-panel hidden" data-panel="multi">
+        <h2 class="card-title">Multi-device UART terminal</h2>
+        <p class="muted">
+          Choose how many USB-serial terminals you need, then create the panels. Each slot has its own baud rate,
+          RX log, and send line. Put each E22 in <b>transparent mode</b> (<code>M0=0</code>, <code>M1=0</code>) for over-the-air UART pass-through.
+          This tab is independent from the configuration toolbar above.
+        </p>
+        <div class="multi-setup">
+          <div class="field narrow">
+            <label for="multi-count">Number of devices</label>
+            <input type="number" id="multi-count" min="1" max="6" value="2" />
+          </div>
+          <button type="button" class="btn btn-primary" id="multi-create">Create panels</button>
+          <p class="muted small multi-setup-hint">You can recreate panels anytime; open ports in this tab will be closed first.</p>
+        </div>
+        <div id="multi-slots" class="multi-slots multi-slots-empty">
+          <p class="muted multi-empty-hint" id="multi-empty-hint">
+            No panels yet. Set the number of devices and click <b>Create panels</b>.
+          </p>
+        </div>
+      </section>
+
       <!-- ============== TAB: HELP ============== -->
       <section class="card tab-panel hidden" data-panel="help">
         <h2 class="card-title">How to use</h2>
@@ -338,6 +370,11 @@
           <li><code>C2 00 09 [9 byte data]</code> — Set Param (volatile)</li>
           <li><code>C1 80 07</code> — Get Product Information (PID)</li>
         </ul>
+        <h3>Multi-device terminal</h3>
+        <p class="muted small">
+          Use the <b>Multi-device terminal</b> tab: set the device count, click <b>Create panels</b>, then connect each USB‑serial adapter in its slot.
+          Match baud to the module’s UART. Use <b>Send as hex</b> for raw frames; otherwise text is UTF‑8 (optional LF).
+        </p>
       </section>
     </main>
 
@@ -367,6 +404,10 @@
             rel="noopener noreferrer"
           >Open Cointree</a>
           <p class="support-link-hint muted small">cointr.ee/ndawinata</p>
+          <p class="support-contact">
+            <a href="mailto:nandawinata@gmail.com">nandawinata@gmail.com</a>
+            <span class="support-contact-sub">Questions or feedback welcome.</span>
+          </p>
         </div>
         <div class="support-qr-block">
           <img
@@ -381,6 +422,12 @@
         </div>
       </div>
     </aside>
+
+    <footer class="site-footer">
+      <a class="site-footer-mail" href="mailto:nandawinata@gmail.com">nandawinata@gmail.com</a>
+      <span class="site-footer-sep">·</span>
+      <a class="site-footer-license" href="LICENSE" rel="license">Apache License 2.0</a>
+    </footer>
   </div>
 
   <script type="module" src="js/app.js"></script>

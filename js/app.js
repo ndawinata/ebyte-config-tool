@@ -6,6 +6,7 @@ import {
   COMMAND, REQ, FREQUENCY_BANDS,
   encodeConfig, decodeConfig, buildFrame, bytesToHex,
 } from './e22.js';
+import { initMultiTerminal } from './multi-terminal.js';
 
 const $  = (id) => document.getElementById(id);
 const qs = (sel, root = document) => root.querySelector(sel);
@@ -99,6 +100,8 @@ function bind16BitPair(hexId, decId) {
 }
 bind16BitPair('addr-hex', 'addr-dec');
 bind16BitPair('key-hex',  'key-dec');
+
+initMultiTerminal();
 
 // ===== Frequency band =====
 function applyBand(band) {

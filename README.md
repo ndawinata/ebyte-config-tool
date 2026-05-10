@@ -4,22 +4,9 @@
 
 Repository folder name may still be `ebyte-config-tool`; the product name shown in the UI is **RF Setting Ebyte**.
 
-![preview](https://placehold.co/800x520/0d0d0d/0a84ff/png?text=RF+Setting+Ebyte)
+![RF Setting Ebyte](img/icon.png)
 
-## Language
 
-The interface is **English only**. There is no bundled i18n library that auto-translates the UI without maintaining locale files or a paid translation API; for other languages, use the browser’s built-in page translate if needed.
-
-## SEO & social preview (after deploy)
-
-In `index.html`, update absolute URLs so Google and messengers show the correct link and image:
-
-- `link rel="canonical"`
-- `meta property="og:url"`
-- `meta property="og:image"` (ideally your own **1200×630** PNG/JPG on the same domain)
-- `application/ld+json` → `url`
-
-The sample origin is GitHub Pages (`https://ndawinata.github.io/ebyte-config-tool/`). Replace it everywhere if you use another host.
 
 ## Features
 
@@ -32,6 +19,7 @@ The sample origin is GitHub Pages (`https://ndawinata.github.io/ebyte-config-too
 - Bands: **E22-400 / 900 / 230**
 - **Remote configuration** tab (experimental)
 - **Download mode** — raw hex for testing
+- **Multi-device terminal** — choose **1–6** devices, create panels, then each slot gets its own RX log + send (text or hex, optional LF)
 - **Theme**: dark / light / system (auto)
 - Activity log with TX/RX hex
 
@@ -96,4 +84,6 @@ Nine data bytes (after header): ADDH, ADDL, NETID, REG0, REG1, REG2 (channel off
 
 ## License
 
-MIT — use, modify, and redistribute freely.
+This project is licensed under the **Apache License, Version 2.0** — see the [`LICENSE`](LICENSE) file for the full text. Copyright and attribution notice: [`NOTICE`](NOTICE).
+
+Third-party hardware and trademarks (e.g. EBYTE, E22) belong to their respective owners; this tool is an independent community utility.
