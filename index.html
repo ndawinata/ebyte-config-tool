@@ -110,11 +110,12 @@
     <section class="toolbar card">
       <div class="toolbar-row">
         <div class="field">
-          <label>Module</label>
-          <select id="model">
+          <label>Band / channel map</label>
+          <select id="model" title="UART protocol is E22-E9X(SL); this only changes MHz ↔ REG2 mapping">
             <option value="400">E22-400 (410–493 MHz)</option>
             <option value="900">E22-900 (850–930 MHz)</option>
             <option value="230">E22-230 (220–236 MHz)</option>
+            <option value="custom">Custom MHz (universal, same protocol)</option>
           </select>
         </div>
         <div class="field">
@@ -135,6 +136,19 @@
         <button id="btn-save"  class="btn">Save File</button>
         <button id="btn-load"  class="btn">Load File</button>
         <input  id="file-load" type="file" accept=".json" hidden />
+      </div>
+      <div id="custom-band-row" class="toolbar-row u-hidden">
+        <div class="field narrow">
+          <label for="custom-freq-base">Base MHz</label>
+          <input id="custom-freq-base" type="number" step="1" value="410" min="1" max="6000" />
+        </div>
+        <div class="field narrow">
+          <label for="custom-freq-end">End MHz</label>
+          <input id="custom-freq-end" type="number" step="1" value="493" min="1" max="6000" />
+        </div>
+        <p class="muted small custom-band-hint">
+          REG2 is one byte: channel MHz = base + offset (0–255). End is capped to base + 255. Works for any E22‑class module that shares this register map; other families (e.g. E220) need a different tool.
+        </p>
       </div>
       <div class="toolbar-row info-row">
         <span class="kv"><b>Port:</b> <span id="port-label">—</span></span>
@@ -358,7 +372,7 @@
         <ol class="help-list">
           <li>Open this app in <b>Chrome</b>, <b>Edge</b>, or <b>Opera</b> (Web Serial API).</li>
           <li>Set the <b>E22</b> module to configuration mode: <code>M0=1</code>, <code>M1=1</code>.</li>
-          <li>Select the module variant, click <b>Open Port</b>, and choose your USB-Serial device.</li>
+          <li>Select the <b>Band / channel map</b> preset (or <b>Custom MHz</b>), click <b>Open Port</b>, and choose your USB-Serial device.</li>
           <li>Click <b>Get Param</b> to read the active register map into the form.</li>
           <li>Edit fields as needed, then <b>Set Param</b> to write permanently to flash.</li>
           <li>When finished, return jumpers to normal mode (<code>M0=0, M1=0</code>) before using the radio on-air.</li>

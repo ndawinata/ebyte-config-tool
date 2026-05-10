@@ -676,6 +676,11 @@ select {
   display: none;
 }
 
+/* Generic hide (toolbar rows, etc.) */
+.u-hidden {
+  display: none !important;
+}
+
 /* ===== Activity log ===== */
 .log-card {
   display: grid;

@@ -12,9 +12,7 @@ const $  = (id) => document.getElementById(id);
 const qs = (sel, root = document) => root.querySelector(sel);
 
 const serial = new SerialBridge();
-let currentBand = '400';
 
-// ===== Logging =====
 const logEl = $('log');
 function log(msg, kind = 'info') {
   const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
@@ -103,23 +101,62 @@ bind16BitPair('key-hex',  'key-dec');
 
 initMultiTerminal();
 
-// ===== Frequency band =====
-function applyBand(band) {
-  currentBand = band;
-  const info = FREQUENCY_BANDS[band];
+// ===== Frequency band (preset or custom MHz; UART protocol = E22-E9X register map) =====
+function getActiveBandInfo() {
+  const m = $('model').value;
+  if (m === 'custom') {
+    let start = Math.round(Number.parseFloat(String($('custom-freq-base').value)));
+    let end = Math.round(Number.parseFloat(String($('custom-freq-end').value)));
+    if (!Number.isFinite(start)) start = 410;
+    if (!Number.isFinite(end)) end = start + 83;
+    if (end < start) end = start;
+    const maxEnd = start + 255;
+    if (end > maxEnd) end = maxEnd;
+    return {
+      preset: 'custom',
+      start,
+      end,
+      label: `${start}–${end} MHz (custom)`,
+    };
+  }
+  const fb = FREQUENCY_BANDS[m];
+  return {
+    preset: m,
+    start: fb.start,
+    end: fb.end,
+    label: fb.label,
+  };
+}
+
+function syncCustomBandRowVisibility() {
+  const row = $('custom-band-row');
+  if (!row) return;
+  row.classList.toggle('u-hidden', $('model').value !== 'custom');
+}
+
+function applyBand() {
+  syncCustomBandRowVisibility();
+  const info = getActiveBandInfo();
   $('ch-band').textContent = `${info.start}–${info.end}`;
   const ch = $('channel');
   if (+ch.value < info.start || +ch.value > info.end) {
-    ch.value = info.start + 23; // default channel
+    const span = info.end - info.start;
+    const mid = info.start + Math.min(23, Math.max(0, Math.floor(span / 2)));
+    ch.value = String(mid);
   }
   ch.min = info.start;
   ch.max = info.end;
   $('r-channel').min = info.start;
   $('r-channel').max = info.end;
-  log(`Frequency band: ${info.label}`, 'info');
+  log(`Band: ${info.label}`, 'info');
 }
-$('model').addEventListener('change', e => applyBand(e.target.value));
-applyBand('400');
+
+$('model').addEventListener('change', () => applyBand());
+['custom-freq-base', 'custom-freq-end'].forEach((id) => {
+  const el = $(id);
+  if (el) el.addEventListener('change', () => { if ($('model').value === 'custom') applyBand(); });
+});
+applyBand();
 
 // ===== Form helpers =====
 function readForm() {
@@ -225,7 +262,7 @@ $('btn-get').addEventListener('click', async () => {
       throw new Error(`Invalid response header: 0x${resp[0].toString(16)}`);
     }
     const args = resp.slice(3, 3 + 9);
-    const cfg = decodeConfig(args, FREQUENCY_BANDS[currentBand].start);
+    const cfg = decodeConfig(args, getActiveBandInfo().start);
     writeForm(cfg);
     setStatus('Configuration read', 'ok');
     log('Get Param finished.', 'info');
@@ -240,7 +277,7 @@ $('btn-set').addEventListener('click', async () => {
   try {
     setStatus('Writing configuration…', 'busy');
     const cfg = readForm();
-    const args = encodeConfig(cfg, FREQUENCY_BANDS[currentBand].start);
+    const args = encodeConfig(cfg, getActiveBandInfo().start);
     const frame = buildFrame(COMMAND.SET_REGISTER, REQ.SET_CONFIG[0], REQ.SET_CONFIG[1], Array.from(args));
     log(`TX » ${bytesToHex(frame)}`, 'out');
     const resp = await serial.command(frame, { responseLength: 3 + REQ.SET_CONFIG[1], timeoutMs: 1500 });
@@ -261,17 +298,20 @@ $('btn-reset').addEventListener('click', async () => {
   if (!confirm('Reset all parameters to factory defaults? This will write to the module.')) return;
   try {
     setStatus('Resetting…', 'busy');
+    const band = getActiveBandInfo();
+    const span = band.end - band.start;
+    const defCh = band.start + Math.min(23, Math.max(0, span));
     const defaults = {
       ADDH: 0, ADDL: 0, NETID: 0,
       uartBaud: '9600', parity: '8N1', airBaud: '2.4k',
       subPacket: '240', ambientNoise: false, power: '30',
-      channel: FREQUENCY_BANDS[currentBand].start + 23,
+      channel: defCh,
       rssiPacket: false, txMode: 'Transparent', repeater: false, lbt: false,
       worMode: 'Receiver', worCycle: '2000',
       cryptH: 0, cryptL: 0,
     };
     writeForm(defaults);
-    const args = encodeConfig(defaults, FREQUENCY_BANDS[currentBand].start);
+    const args = encodeConfig(defaults, band.start);
     const frame = buildFrame(COMMAND.SET_REGISTER, REQ.SET_CONFIG[0], REQ.SET_CONFIG[1], Array.from(args));
     log(`TX » ${bytesToHex(frame)}`, 'out');
     const resp = await serial.command(frame, { responseLength: 3 + REQ.SET_CONFIG[1], timeoutMs: 1500 });
@@ -287,11 +327,15 @@ $('btn-reset').addEventListener('click', async () => {
 // ===== File Save / Load =====
 $('btn-save').addEventListener('click', () => {
   const cfg = readForm();
+  const bandInfo = getActiveBandInfo();
   const out = {
     _meta: {
       app: 'RF Setting Ebyte',
       version: '1.0',
-      band: currentBand,
+      band: bandInfo.preset,
+      ...(bandInfo.preset === 'custom'
+        ? { customBase: bandInfo.start, customEnd: bandInfo.end }
+        : {}),
       savedAt: new Date().toISOString(),
     },
     ...cfg,
@@ -313,9 +357,16 @@ $('file-load').addEventListener('change', async (e) => {
   try {
     const text = await file.text();
     const data = JSON.parse(text);
-    if (data._meta?.band && FREQUENCY_BANDS[data._meta.band]) {
+    if (data._meta?.band === 'custom' && Number.isFinite(Number(data._meta.customBase))) {
+      $('model').value = 'custom';
+      $('custom-freq-base').value = String(data._meta.customBase);
+      $('custom-freq-end').value = String(
+        Number.isFinite(Number(data._meta.customEnd)) ? data._meta.customEnd : Number(data._meta.customBase) + 83,
+      );
+      applyBand();
+    } else if (data._meta?.band && FREQUENCY_BANDS[data._meta.band]) {
       $('model').value = data._meta.band;
-      applyBand(data._meta.band);
+      applyBand();
     }
     writeForm(data);
     log(`Configuration loaded: ${file.name}`, 'info');
@@ -335,7 +386,7 @@ async function remoteFrame(commandByte) {
   // Public spec is incomplete—use with care.
   const addh = parseInt($('r-addh').value || '0', 10) & 0xFF;
   const addl = parseInt($('r-addl').value || '0', 10) & 0xFF;
-  const ch   = (parseInt($('r-channel').value || '0', 10) - FREQUENCY_BANDS[currentBand].start) & 0xFF;
+  const ch   = (parseInt($('r-channel').value || '0', 10) - getActiveBandInfo().start) & 0xFF;
   return new Uint8Array([
     0xCF, 0xCF,
     addh, addl, ch,
@@ -353,7 +404,7 @@ $('btn-r-get').addEventListener('click', async () => {
 $('btn-r-set').addEventListener('click', async () => {
   try {
     const cfg  = readForm();
-    const args = encodeConfig(cfg, FREQUENCY_BANDS[currentBand].start);
+    const args = encodeConfig(cfg, getActiveBandInfo().start);
     const head = await remoteFrame(COMMAND.SET_REGISTER);
     const frame = new Uint8Array([...head, ...args]);
     log(`TX » ${bytesToHex(frame)}`, 'out');
