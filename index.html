@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+
+  <title>RF Setting Ebyte — E22-E9X(SL) LoRa config in the browser | Web Serial</title>
+  <meta
+    name="description"
+    content="RF Setting Ebyte: configure E22-E9X(SL) LoRa modules from Chrome or Edge with Web Serial—no desktop install. Read/write UART, channel, air rate, power, and save JSON presets."
+  />
+  <meta
+    name="keywords"
+    content="RF Setting Ebyte, E22, E22-E9X, LoRa, SX1262, E22 config, RF setting, Web Serial, USB serial, browser config, EBYTE wireless module"
+  />
+  <meta name="author" content="RF Setting Ebyte" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
+
+  <!-- Replace origin with your deployed URL (e.g. GitHub Pages or custom domain). -->
+  <link rel="canonical" href="https://ndawinata.github.io/ebyte-config-tool/" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="RF Setting Ebyte" />
+  <meta property="og:url" content="https://ndawinata.github.io/ebyte-config-tool/" />
+  <meta property="og:title" content="RF Setting Ebyte — E22 LoRa configuration via Web Serial" />
+  <meta
+    property="og:description"
+    content="Free web tool for E22-E9X(SL): get/set registers, JSON presets, dark/light themes. Works in Chromium browsers over USB-Serial."
+  />
+  <meta
+    property="og:image"
+    content="https://placehold.co/1200x630/1d1d1f/0a84ff/png?text=RF+Setting+Ebyte"
+  />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="RF Setting Ebyte — E22 module configuration in the browser" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="RF Setting Ebyte — E22 LoRa via Web Serial" />
+  <meta
+    name="twitter:description"
+    content="Configure E22 modules from the browser. No install—open in Chrome or Edge."
+  />
+  <meta
+    name="twitter:image"
+    content="https://placehold.co/1200x630/1d1d1f/0a84ff/png?text=RF+Setting+Ebyte"
+  />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "RF Setting Ebyte",
+    "alternateName": "ebyte-config-tool",
+    "description": "Web application to configure E22-E9X(SL) LoRa radio modules using the Web Serial API. Supports get/set parameters, JSON presets, and E22-400/900/230 frequency variants.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any (Chromium browser)",
+    "browserRequirements": "Requires Web Serial API (Chrome, Edge, Opera, Brave)",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "inLanguage": "en",
+    "url": "https://ndawinata.github.io/ebyte-config-tool/"
+  }
+  </script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ============== Header ============== -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="1.75"/>
+            <path d="M16 4v4M16 24v4M4 16h4M24 16h4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">RF Setting <span class="brand-sep">·</span> <span class="accent">Ebyte</span></div>
+          <div class="brand-sub">E22-E9X(SL) in the browser — Web Serial · v1.0</div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <span id="status-pill" class="pill pill-muted">
+          <span class="pill-dot"></span>
+          <span id="status-text">Disconnected</span>
+        </span>
+        <div class="theme-bar" role="group" aria-label="Appearance">
+          <button type="button" class="theme-seg" data-theme-mode="dark" title="Dark mode">Dark</button>
+          <button type="button" class="theme-seg" data-theme-mode="light" title="Light mode">Light</button>
+          <button type="button" class="theme-seg" data-theme-mode="system" title="Match system">Auto</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============== Toolbar ============== -->
+    <section class="toolbar card">
+      <div class="toolbar-row">
+        <div class="field">
+          <label>Module</label>
+          <select id="model">
+            <option value="400">E22-400 (410–493 MHz)</option>
+            <option value="900">E22-900 (850–930 MHz)</option>
+            <option value="230">E22-230 (220–236 MHz)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Config baud</label>
+          <select id="config-baud">
+            <option value="9600" selected>9600</option>
+            <option value="115200">115200</option>
+          </select>
+        </div>
+        <div class="toolbar-divider"></div>
+        <button id="btn-open"  class="btn btn-primary">Open Port</button>
+        <button id="btn-close" class="btn"               disabled>Close</button>
+        <div class="toolbar-divider"></div>
+        <button id="btn-get"   class="btn"  disabled>Get Param</button>
+        <button id="btn-set"   class="btn"  disabled>Set Param</button>
+        <button id="btn-reset" class="btn btn-danger" disabled>Param Reset</button>
+        <div class="toolbar-divider"></div>
+        <button id="btn-save"  class="btn">Save File</button>
+        <button id="btn-load"  class="btn">Load File</button>
+        <input  id="file-load" type="file" accept=".json" hidden />
+      </div>
+      <div class="toolbar-row info-row">
+        <span class="kv"><b>Port:</b> <span id="port-label">—</span></span>
+        <span class="kv"><b>PID:</b>  <span id="pid-label">—</span></span>
+        <span class="kv"><b>Mode:</b> Pin <code>M0=1, M1=1</code> (Configuration)</span>
+      </div>
+    </section>
+
+    <!-- ============== Tabs ============== -->
+    <nav class="tabs">
+      <button class="tab tab-active" data-tab="local">Local Configuration</button>
+      <button class="tab"            data-tab="remote">Remote Configuration</button>
+      <button class="tab"            data-tab="download">Download mode</button>
+      <button class="tab"            data-tab="help">Help</button>
+    </nav>
+
+    <main class="main">
+      <!-- ============== TAB: LOCAL ============== -->
+      <section class="card tab-panel" data-panel="local">
+        <h2 class="card-title">Module parameters</h2>
+
+        <div class="grid">
+          <!-- Address group -->
+          <div class="field">
+            <label>Address (16-bit)</label>
+            <div class="addr-row">
+              <input id="addr-hex" type="text" maxlength="4" placeholder="0000" />
+              <span class="hint">hex</span>
+              <input id="addr-dec" type="number" min="0" max="65535" placeholder="0" />
+              <span class="hint">dec</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>NET ID</label>
+            <input id="netid" type="number" min="0" max="255" value="0" />
+          </div>
+
+          <!-- UART -->
+          <div class="field">
+            <label>UART Baud Rate</label>
+            <select id="uart-baud">
+              <option>1200</option><option>2400</option><option>4800</option>
+              <option selected>9600</option><option>19200</option>
+              <option>38400</option><option>57600</option><option>115200</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Parity</label>
+            <select id="parity">
+              <option value="8N1" selected>8N1</option>
+              <option value="8O1">8O1</option>
+              <option value="8E1">8E1</option>
+            </select>
+          </div>
+
+          <!-- Air -->
+          <div class="field">
+            <label>Air Data Rate</label>
+            <select id="air-baud">
+              <option value="0.3k">0.3k</option>
+              <option value="1.2k">1.2k</option>
+              <option value="2.4k" selected>2.4k</option>
+              <option value="4.8k">4.8k</option>
+              <option value="9.6k">9.6k</option>
+              <option value="19.2k">19.2k</option>
+              <option value="38.4k">38.4k</option>
+              <option value="62.5k">62.5k</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Sub-packet length (B)</label>
+            <select id="sub-packet">
+              <option value="240" selected>240</option>
+              <option value="128">128</option>
+              <option value="64">64</option>
+              <option value="32">32</option>
+            </select>
+          </div>
+
+          <!-- Power & channel -->
+          <div class="field">
+            <label>Transmitting Power (dBm)</label>
+            <select id="power">
+              <option value="30" selected>30</option>
+              <option value="27">27</option>
+              <option value="24">24</option>
+              <option value="21">21</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Channel (<span id="ch-band">410–493</span> MHz)</label>
+            <input id="channel" type="number" value="433" />
+          </div>
+
+          <!-- Modes -->
+          <div class="field">
+            <label>Transmission Mode</label>
+            <select id="tx-mode">
+              <option value="Transparent" selected>Transparent</option>
+              <option value="Fixed">Fixed-point</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>WOR Role</label>
+            <select id="wor-mode">
+              <option value="Receiver" selected>Receiver</option>
+              <option value="Transmitter">Transmitter</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>WOR Cycle (ms)</label>
+            <select id="wor-cycle">
+              <option>500</option><option>1000</option><option>1500</option>
+              <option selected>2000</option><option>2500</option>
+              <option>3000</option><option>3500</option><option>4000</option>
+            </select>
+          </div>
+
+          <div class="field checks">
+            <label>Flags</label>
+            <div class="check-grid">
+              <label class="check"><input type="checkbox" id="rssi-packet" /> Packet RSSI</label>
+              <label class="check"><input type="checkbox" id="ambient" />     Channel RSSI (ambient noise)</label>
+              <label class="check"><input type="checkbox" id="lbt" />         LBT</label>
+              <label class="check"><input type="checkbox" id="repeater" />    Relay (repeater)</label>
+            </div>
+          </div>
+
+          <!-- Crypto key -->
+          <div class="field span-2">
+            <label>Encryption key (16-bit)</label>
+            <div class="addr-row">
+              <input id="key-hex" type="text" maxlength="4" placeholder="0000" />
+              <span class="hint">hex</span>
+              <input id="key-dec" type="number" min="0" max="65535" placeholder="0" />
+              <span class="hint">dec</span>
+              <span class="hint muted">Key is write-only (cannot be read back from the module)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== TAB: REMOTE ============== -->
+      <section class="card tab-panel hidden" data-panel="remote">
+        <h2 class="card-title">Remote configuration (Fixed-point)</h2>
+        <p class="muted">
+          For remote configuration, the local module must use <b>fixed-point transmission</b>
+          and share the same <b>NET ID</b> as the remote node. Many desktop RF tools forward
+          GET/SET using a proprietary <code>0xCF 0xCF</code> prefix to the target address.
+        </p>
+        <div class="grid">
+          <div class="field">
+            <label>Target ADDH</label>
+            <input id="r-addh" type="number" min="0" max="255" value="0" />
+          </div>
+          <div class="field">
+            <label>Target ADDL</label>
+            <input id="r-addl" type="number" min="0" max="255" value="0" />
+          </div>
+          <div class="field">
+            <label>Target Channel</label>
+            <input id="r-channel" type="number" value="433" />
+          </div>
+        </div>
+        <div class="row">
+          <button id="btn-r-get" class="btn" disabled>Remote Get</button>
+          <button id="btn-r-set" class="btn" disabled>Remote Set</button>
+        </div>
+        <p class="muted small">
+          Note: public documentation for remote frames is incomplete for all variants. This tab
+          sends an experimental <code>CF CF C1 …</code> sequence through the open port for
+          testing via the local module.
+        </p>
+      </section>
+
+      <!-- ============== TAB: DOWNLOAD ============== -->
+      <section class="card tab-panel hidden" data-panel="download">
+        <h2 class="card-title">Download / Firmware mode</h2>
+        <p class="muted">
+          Desktop “Download” mode is often used to push firmware to a companion MCU (e.g. E22-DTU).
+          Use this tab to send raw bytes for link testing.
+        </p>
+        <div class="grid">
+          <div class="field span-2">
+            <label>Bytes (hex, space-separated)</label>
+            <input id="raw-bytes" type="text" placeholder="C1 00 09" />
+          </div>
+        </div>
+        <div class="row">
+          <button id="btn-raw-send" class="btn" disabled>Send Raw</button>
+        </div>
+      </section>
+
+      <!-- ============== TAB: HELP ============== -->
+      <section class="card tab-panel hidden" data-panel="help">
+        <h2 class="card-title">How to use</h2>
+        <ol class="help-list">
+          <li>Open this app in <b>Chrome</b>, <b>Edge</b>, or <b>Opera</b> (Web Serial API).</li>
+          <li>Set the <b>E22</b> module to configuration mode: <code>M0=1</code>, <code>M1=1</code>.</li>
+          <li>Select the module variant, click <b>Open Port</b>, and choose your USB-Serial device.</li>
+          <li>Click <b>Get Param</b> to read the active register map into the form.</li>
+          <li>Edit fields as needed, then <b>Set Param</b> to write permanently to flash.</li>
+          <li>When finished, return jumpers to normal mode (<code>M0=0, M1=0</code>) before using the radio on-air.</li>
+        </ol>
+        <h3>Protocol frames</h3>
+        <ul class="help-list">
+          <li><code>C1 00 09</code> — Get Param (9 register)</li>
+          <li><code>C0 00 09 [9 byte data]</code> — Set Param (permanent)</li>
+          <li><code>C2 00 09 [9 byte data]</code> — Set Param (volatile)</li>
+          <li><code>C1 80 07</code> — Get Product Information (PID)</li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- ============== Activity log ============== -->
+    <section class="card log-card">
+      <div class="log-header">
+        <h3>Activity log</h3>
+        <div class="log-actions">
+          <button id="btn-clear-log" class="btn btn-ghost">Clear</button>
+        </div>
+      </div>
+      <pre id="log" class="log"></pre>
+    </section>
+
+    <!-- ============== Dukungan (Saweria + Cointree) ============== -->
+    <aside class="card support-card" aria-label="Support the project">
+      <div class="support-inner">
+        <div class="support-copy">
+          <h3 class="support-heading">Support</h3>
+          <p class="support-desc">
+            If this tool saved you time, consider tipping via Saweria (QR) or the Cointree link below—thank you.
+          </p>
+          <a
+            class="btn btn-primary support-cta"
+            href="https://cointr.ee/ndawinata"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Open Cointree</a>
+          <p class="support-link-hint muted small">cointr.ee/ndawinata</p>
+        </div>
+        <div class="support-qr-block">
+          <img
+            class="support-qr"
+            src="img/saweria.png"
+            width="160"
+            alt="QR Saweria"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="support-qr-label">Saweria</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
