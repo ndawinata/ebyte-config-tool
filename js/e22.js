@@ -69,14 +69,36 @@ export const SUB_PACKET = {
   '32':  0xC0,
 };
 export const MASK_SUB_PACKET = 0xC0;
-
-export const POWER_DBM = {
-  '30': 0x00,
-  '27': 0x01,
-  '24': 0x02,
-  '21': 0x03,
-};
 export const MASK_POWER = 0x03;
+
+/** Same 2-bit REG1 power codes; label depends on module PA (RF Setting shows different dBm per variant). */
+export const POWER_PROFILES = {
+  pa30: {
+    id: 'pa30',
+    label: '30 / 27 / 24 / 21 dBm (+30 PA)',
+    byCode: ['30', '27', '24', '21'],
+  },
+  pa22: {
+    id: 'pa22',
+    label: '22 / 17 / 13 / 10 dBm (varian RF Setting / PA lebih rendah)',
+    byCode: ['22', '17', '13', '10'],
+  },
+};
+
+export function getPowerProfile(profileId) {
+  const id = profileId && POWER_PROFILES[profileId] ? profileId : 'pa30';
+  return POWER_PROFILES[id];
+}
+
+function powerCodeFromLabel(powerLabel, profile) {
+  const i = profile.byCode.indexOf(String(powerLabel));
+  return (i >= 0 ? i : 0) & MASK_POWER;
+}
+
+function powerLabelFromCode(reg1, profile) {
+  const code = reg1 & MASK_POWER;
+  return profile.byCode[code] ?? profile.byCode[0];
+}
 
 export const MASK_AMBIENT_NOISE = 0x20; // RSSI ambient noise enable
 
@@ -121,7 +143,7 @@ export const FREQUENCY_BANDS = {
  *   cryptH, cryptL,
  * }
  */
-export function encodeConfig(cfg, freqStart) {
+export function encodeConfig(cfg, freqStart, powerProfile = getPowerProfile('pa30')) {
   const u8 = (n) => (n & 0xFF);
   const args = new Uint8Array(9);
 
@@ -140,7 +162,7 @@ export function encodeConfig(cfg, freqStart) {
   let reg1 = 0;
   reg1 |= SUB_PACKET[cfg.subPacket] ?? 0x00;
   if (cfg.ambientNoise) reg1 |= MASK_AMBIENT_NOISE;
-  reg1 |= POWER_DBM[cfg.power] ?? 0x00;
+  reg1 |= powerCodeFromLabel(cfg.power, powerProfile);
   args[REGISTER.REG1] = reg1;
 
   // REG2 channel offset
@@ -168,7 +190,7 @@ export function encodeConfig(cfg, freqStart) {
  * Decode 9 raw config bytes into a configuration object.
  * Returns the inverse of encodeConfig().
  */
-export function decodeConfig(args, freqStart) {
+export function decodeConfig(args, freqStart, powerProfile = getPowerProfile('pa30')) {
   const lookup = (table, value) =>
     Object.entries(table).find(([, v]) => v === value)?.[0] ?? null;
 
@@ -185,7 +207,7 @@ export function decodeConfig(args, freqStart) {
     airBaud:      lookup(AIR_BAUD, reg0 & MASK_AIR_BAUD),
     subPacket:    lookup(SUB_PACKET, reg1 & MASK_SUB_PACKET),
     ambientNoise: (reg1 & MASK_AMBIENT_NOISE) !== 0,
-    power:        lookup(POWER_DBM, reg1 & MASK_POWER),
+    power:        powerLabelFromCode(reg1, powerProfile),
     channel:      args[REGISTER.REG2] + freqStart,
     rssiPacket:   (reg3 & MASK_RSSI) !== 0,
     txMode:       lookup(TX_MODE, reg3 & MASK_TX_MODE),
@@ -205,6 +227,21 @@ export function decodeConfig(args, freqStart) {
 export function buildFrame(command, startAddr, length, payload = []) {
   const out = [command, startAddr, length, ...payload];
   return new Uint8Array(out);
+}
+
+/**
+ * 12-byte wire sequence matching desktop “Parameter (Hex String)” for permanent write:
+ * C0 | start 00 | length 09 | nine register bytes (ADDH…CRYPT_L).
+ * Same payload the module stores; GET response uses header C1 instead.
+ */
+export function buildSetConfigFrame(nineRegisterBytes) {
+  const p = nineRegisterBytes instanceof Uint8Array
+    ? Array.from(nineRegisterBytes)
+    : [...nineRegisterBytes];
+  if (p.length !== 9) {
+    throw new Error('buildSetConfigFrame: expected 9 register bytes');
+  }
+  return buildFrame(COMMAND.SET_REGISTER, REQ.SET_CONFIG[0], REQ.SET_CONFIG[1], p);
 }
 
 export function bytesToHex(bytes) {

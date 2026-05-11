@@ -8,6 +8,19 @@ const MAX_SLOTS = 6;
 const COUNT_KEY = 'multi-device-count';
 const textEncoder = new TextEncoder();
 
+const SLOT_WRAP =
+  'multi-slot flex flex-col gap-3 rounded-2xl border border-zinc-200/80 bg-white/90 p-4 shadow-sm dark:border-zinc-500/45 dark:bg-zinc-800/90 dark:shadow-lg dark:shadow-black/20';
+
+const ROOT_GRID = 'grid gap-4 sm:grid-cols-1 xl:grid-cols-2';
+
+const TERM_LINE = 'font-mono text-[12px] leading-relaxed ';
+const TERM_CLS = {
+  'log-err': `${TERM_LINE}text-red-600 dark:text-red-400`,
+  'log-info': `${TERM_LINE}text-blue-600 dark:text-blue-400`,
+  'log-in': `${TERM_LINE}text-emerald-600 dark:text-emerald-400`,
+  'log-out': `${TERM_LINE}text-amber-600 dark:text-amber-400`,
+};
+
 function bytesToHexLine(u8) {
   return Array.from(u8, (b) => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
 }
@@ -31,8 +44,8 @@ function parseHexToBytes(str) {
 
 function appendTerminal(pre, line, cls) {
   const span = document.createElement('span');
-  if (cls) span.className = cls;
-  span.textContent = line + '\n';
+  if (cls) span.className = TERM_CLS[cls] ?? TERM_CLS['log-info'];
+  span.textContent = `${line}\n`;
   pre.appendChild(span);
   pre.scrollTop = pre.scrollHeight;
   const max = 8000;
@@ -45,17 +58,17 @@ function appendTerminal(pre, line, cls) {
 
 function createSlot(index) {
   const wrap = document.createElement('div');
-  wrap.className = 'multi-slot';
+  wrap.className = SLOT_WRAP;
   wrap.dataset.slotIndex = String(index);
   wrap.innerHTML = `
-    <div class="multi-slot-head">
-      <span class="multi-slot-title">Device ${index}</span>
-      <span class="multi-slot-status muted small">Disconnected</span>
+    <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-zinc-200/80 pb-2 dark:border-zinc-600/40">
+      <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Device ${index}</span>
+      <span class="multi-slot-status text-xs text-zinc-500 dark:text-zinc-400">Disconnected</span>
     </div>
-    <div class="multi-slot-toolbar">
-      <div class="field narrow">
-        <label>Baud</label>
-        <select class="multi-baud">
+    <div class="flex flex-wrap items-center gap-2 gap-y-2 py-2">
+      <div class="grid w-28 gap-1">
+        <label class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Baud</label>
+        <select class="multi-baud w-full rounded-lg border border-black/12 bg-white px-2 py-2 text-sm dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
           <option value="9600" selected>9600</option>
           <option value="19200">19200</option>
           <option value="38400">38400</option>
@@ -63,17 +76,17 @@ function createSlot(index) {
           <option value="115200">115200</option>
         </select>
       </div>
-      <button type="button" class="btn btn-primary multi-btn-connect">Connect</button>
-      <button type="button" class="btn multi-btn-disconnect" disabled>Disconnect</button>
-      <label class="check inline"><input type="checkbox" class="multi-append-lf" checked /> Append LF</label>
-      <label class="check inline"><input type="checkbox" class="multi-hex-send" /> Send as hex</label>
-      <label class="check inline"><input type="checkbox" class="multi-hex-rx" /> RX as hex only</label>
-      <button type="button" class="btn btn-ghost multi-btn-clear">Clear log</button>
+      <button type="button" class="multi-btn-connect shrink-0 rounded-xl border border-blue-600 bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 dark:border-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500">Connect</button>
+      <button type="button" class="multi-btn-disconnect shrink-0 rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-zinc-50 disabled:pointer-events-none disabled:opacity-40 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600" disabled>Disconnect</button>
+      <label class="flex cursor-pointer items-center gap-1.5 text-xs text-zinc-700 dark:text-zinc-300"><input type="checkbox" class="multi-append-lf rounded border-zinc-300 text-blue-600 dark:border-zinc-600" checked /> Append LF</label>
+      <label class="flex cursor-pointer items-center gap-1.5 text-xs text-zinc-700 dark:text-zinc-300"><input type="checkbox" class="multi-hex-send rounded border-zinc-300 text-blue-600 dark:border-zinc-600" /> Send as hex</label>
+      <label class="flex cursor-pointer items-center gap-1.5 text-xs text-zinc-700 dark:text-zinc-300"><input type="checkbox" class="multi-hex-rx rounded border-zinc-300 text-blue-600 dark:border-zinc-600" /> RX as hex only</label>
+      <button type="button" class="multi-btn-clear rounded-lg px-2 py-1 text-sm font-medium text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/40">Clear log</button>
     </div>
-    <pre class="multi-term-out log" aria-live="polite"></pre>
-    <div class="multi-slot-send">
-      <input type="text" class="multi-send-input" placeholder="Type text or hex (when enabled)…" autocomplete="off" />
-      <button type="button" class="btn btn-primary multi-btn-send" disabled>Send</button>
+    <pre class="multi-term-out max-h-[min(40vh,220px)] min-h-[100px] overflow-auto whitespace-pre-wrap break-words rounded-lg border border-black/10 bg-zinc-50 p-3 font-mono text-xs text-zinc-800 dark:border-zinc-500/35 dark:bg-zinc-900/50 dark:text-zinc-200" aria-live="polite"></pre>
+    <div class="flex gap-2 pt-1">
+      <input type="text" class="multi-send-input min-w-0 flex-1 rounded-lg border border-black/12 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" placeholder="Type text or hex (when enabled)…" autocomplete="off" />
+      <button type="button" class="multi-btn-send shrink-0 rounded-xl border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-40 dark:border-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500" disabled>Send</button>
     </div>
   `;
 
@@ -225,7 +238,7 @@ export function initMultiTerminal() {
     localStorage.setItem(COUNT_KEY, String(n));
 
     root.innerHTML = '';
-    root.classList.remove('multi-slots-empty');
+    root.className = ROOT_GRID;
     for (let i = 1; i <= n; i += 1) {
       root.appendChild(createSlot(i));
     }

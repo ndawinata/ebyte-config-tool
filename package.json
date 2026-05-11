@@ -1,0 +1,5 @@
+{
+  "name": "ebyte-config-tool",
+  "private": true,
+  "description": "Static site: Tailwind via CDN in index.html (no build step). Safe for GitHub Pages."
+}

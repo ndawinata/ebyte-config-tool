@@ -1,0 +1,5 @@
+# https://www.robotstxt.org/
+User-agent: *
+Allow: /
+
+# Public RF Setting Ebyte tool — welcome crawlers (canonical URL in index.html).

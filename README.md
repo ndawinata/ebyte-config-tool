@@ -20,8 +20,9 @@ Repository folder name may still be `ebyte-config-tool`; the product name shown 
 - **Remote configuration** tab (experimental)
 - **Download mode** — raw hex for testing
 - **Multi-device terminal** — choose **1–6** devices, create panels, then each slot gets its own RX log + send (text or hex, optional LF)
-- **Theme**: dark / light / system (auto)
+- **Theme**: dark / light / system (auto) — `class="dark"` on `<html>` via Tailwind `darkMode: 'class'`
 - Activity log with TX/RX hex
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) from **CDN** in `index.html` (no build step; works on **GitHub Pages** as static files)
 
 ## Requirements
 

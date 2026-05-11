@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -17,14 +17,13 @@
   <meta name="author" content="RF Setting Ebyte" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="googlebot" content="index, follow" />
-  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#18181b" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
   <meta name="google-site-verification" content="N01IkzRuV93wUmvxbuGgdSnoZR4lFBWT7kSUp9ioNTA" />
 
   <link rel="icon" type="image/png" href="img/icon.png" />
   <link rel="apple-touch-icon" href="img/icon.png" />
 
-  <!-- Replace origin with your deployed URL (e.g. GitHub Pages or custom domain). -->
   <link rel="canonical" href="https://ndawinata.github.io/ebyte-config-tool/" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:type" content="website" />
@@ -35,10 +34,7 @@
     property="og:description"
     content="Free web tool for E22-E9X(SL): get/set registers, JSON presets, dark/light themes. Works in Chromium browsers over USB-Serial."
   />
-  <meta
-    property="og:image"
-    content="https://ndawinata.github.io/ebyte-config-tool/img/icon.png"
-  />
+  <meta property="og:image" content="https://ndawinata.github.io/ebyte-config-tool/img/icon.png" />
   <meta property="og:image:width" content="2048" />
   <meta property="og:image:height" content="2048" />
   <meta property="og:image:alt" content="RF Setting Ebyte — E22 module configuration in the browser" />
@@ -49,10 +45,7 @@
     name="twitter:description"
     content="Configure E22 modules from the browser. No install—open in Chrome or Edge."
   />
-  <meta
-    name="twitter:image"
-    content="https://ndawinata.github.io/ebyte-config-tool/img/icon.png"
-  />
+  <meta name="twitter:image" content="https://ndawinata.github.io/ebyte-config-tool/img/icon.png" />
 
   <script type="application/ld+json">
   {
@@ -71,377 +64,409 @@
   }
   </script>
 
-  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: [
+              '-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"SF Pro Display"',
+              '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'sans-serif',
+            ],
+            mono: ['"SF Mono"', 'ui-monospace', 'Menlo', 'Consolas', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
 </head>
-<body>
-  <div class="app">
-    <!-- ============== Header ============== -->
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
+<body class="min-h-full bg-zinc-100 bg-[radial-gradient(ellipse_100%_80%_at_50%_-30%,rgba(0,113,227,0.12),transparent_55%)] font-sans text-[15px] leading-snug tracking-tight text-zinc-900 antialiased transition-colors dark:bg-zinc-900 dark:bg-[radial-gradient(ellipse_100%_80%_at_50%_-30%,rgba(59,130,246,0.07),transparent_55%)] dark:text-zinc-100">
+  <div class="mx-auto flex max-w-[980px] flex-col gap-5 px-4 pb-12 pt-5 sm:px-7">
+    <!-- Header -->
+    <header class="sticky top-3 z-40 flex flex-wrap items-center justify-between gap-4 rounded-[20px] border border-black/10 bg-white/75 px-4 py-3.5 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25 sm:px-5">
+      <div class="flex min-w-0 items-center gap-3.5">
+        <div
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-black/10 bg-white shadow-md shadow-blue-500/15 dark:border-zinc-500/35 dark:bg-zinc-900/40 dark:shadow-none dark:ring-1 dark:ring-white/5"
+          aria-hidden="true"
+        >
           <img
-            class="brand-mark-img"
+            class="h-[34px] w-[34px] object-contain dark:hidden"
             src="img/icon1.png"
             width="40"
             height="40"
             alt=""
             decoding="async"
           />
+          <img
+            class="hidden h-[38px] w-[38px] object-contain dark:block dark:drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]"
+            src="img/icon-transparent.png"
+            width="40"
+            height="40"
+            alt=""
+            decoding="async"
+          />
         </div>
-        <div class="brand-text">
-          <div class="brand-title">RF Setting <span class="brand-sep">·</span> <span class="accent">Ebyte</span></div>
-          <div class="brand-sub">E22-E9X(SL) in the browser — Web Serial · v1.0</div>
+        <div class="min-w-0">
+          <div class="text-[17px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+            RF Setting <span class="text-zinc-400 dark:text-zinc-500">·</span> <span class="text-blue-600 dark:text-blue-400">Ebyte</span>
+          </div>
+          <div class="text-[12px] font-medium text-zinc-500 dark:text-zinc-400">E22-E9X(SL) in the browser — Web Serial · v1.0</div>
         </div>
       </div>
-
-      <div class="topbar-actions">
-        <span id="status-pill" class="pill pill-muted">
-          <span class="pill-dot"></span>
+      <div class="flex flex-wrap items-center gap-3">
+        <span id="status-pill" class="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:border-zinc-500/40 dark:bg-zinc-700/80 dark:text-zinc-300">
+          <span class="h-2 w-2 shrink-0 rounded-full bg-current opacity-70" aria-hidden="true"></span>
           <span id="status-text">Disconnected</span>
         </span>
-        <div class="theme-bar" role="group" aria-label="Appearance">
-          <button type="button" class="theme-seg" data-theme-mode="dark" title="Dark mode">Dark</button>
-          <button type="button" class="theme-seg" data-theme-mode="light" title="Light mode">Light</button>
-          <button type="button" class="theme-seg" data-theme-mode="system" title="Match system">Auto</button>
+        <div class="flex gap-1 rounded-[10px] border border-black/5 bg-zinc-200/80 p-1 dark:border-zinc-600/35 dark:bg-zinc-900/90" role="group" aria-label="Appearance">
+          <button type="button" class="theme-seg rounded-lg px-3 py-1.5 text-xs font-medium transition" data-theme-mode="dark" title="Dark mode">Dark</button>
+          <button type="button" class="theme-seg rounded-lg px-3 py-1.5 text-xs font-medium transition" data-theme-mode="light" title="Light mode">Light</button>
+          <button type="button" class="theme-seg rounded-lg px-3 py-1.5 text-xs font-medium transition" data-theme-mode="system" title="Match system">Auto</button>
         </div>
       </div>
     </header>
 
-    <!-- ============== Toolbar ============== -->
-    <section class="toolbar card">
-      <div class="toolbar-row">
-        <div class="field">
-          <label>Band / channel map</label>
-          <select id="model" title="UART protocol is E22-E9X(SL); this only changes MHz ↔ REG2 mapping">
+    <!-- Toolbar -->
+    <section class="rounded-[20px] border border-black/10 bg-white/78 p-4 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25 sm:p-5">
+      <div class="flex flex-wrap items-end gap-3 gap-y-4">
+        <div class="grid min-w-[140px] flex-1 gap-1.5 sm:min-w-[180px]">
+          <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Band / channel map</label>
+          <select id="model" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 text-[15px] text-zinc-900 shadow-sm dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" title="UART protocol is E22-E9X(SL); this only changes MHz ↔ REG2 mapping">
             <option value="400">E22-400 (410–493 MHz)</option>
             <option value="900">E22-900 (850–930 MHz)</option>
             <option value="230">E22-230 (220–236 MHz)</option>
             <option value="custom">Custom MHz (universal, same protocol)</option>
           </select>
         </div>
-        <div class="field">
-          <label>Config baud</label>
-          <select id="config-baud">
+        <div class="grid min-w-[100px] gap-1.5">
+          <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Config baud</label>
+          <select id="config-baud" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 text-[15px] dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
             <option value="9600" selected>9600</option>
             <option value="115200">115200</option>
           </select>
         </div>
-        <div class="toolbar-divider"></div>
-        <button id="btn-open"  class="btn btn-primary">Open Port</button>
-        <button id="btn-close" class="btn"               disabled>Close</button>
-        <div class="toolbar-divider"></div>
-        <button id="btn-get"   class="btn"  disabled>Get Param</button>
-        <button id="btn-set"   class="btn"  disabled>Set Param</button>
-        <button id="btn-reset" class="btn btn-danger" disabled>Param Reset</button>
-        <div class="toolbar-divider"></div>
-        <button id="btn-save"  class="btn">Save File</button>
-        <button id="btn-load"  class="btn">Load File</button>
-        <input  id="file-load" type="file" accept=".json" hidden />
+        <div class="grid min-w-[180px] flex-1 gap-1.5 sm:max-w-xs">
+          <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400" for="power-profile">Profil label daya</label>
+          <select id="power-profile" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 text-[15px] dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" title="Bit register daya sama (2 bit); label dBm mengikuti varian modul / RF Setting.">
+            <option value="pa30">30 / 27 / 24 / 21 dBm (+30 PA)</option>
+            <option value="pa22">22 / 17 / 13 / 10 dBm (varian RF Setting)</option>
+          </select>
+        </div>
       </div>
-      <div id="custom-band-row" class="toolbar-row u-hidden">
-        <div class="field narrow">
-          <label for="custom-freq-base">Base MHz</label>
-          <input id="custom-freq-base" type="number" step="1" value="410" min="1" max="6000" />
+      <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-black/5 pt-4 dark:border-zinc-600/30">
+        <button id="btn-open" type="button" class="btn rounded-xl border border-blue-600 bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-40 dark:border-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500">Open Port</button>
+        <button id="btn-close" type="button" class="btn rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-zinc-50 disabled:pointer-events-none disabled:opacity-40 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600" disabled>Close</button>
+        <span class="mx-1 hidden h-6 w-px shrink-0 bg-black/10 sm:inline-block dark:bg-zinc-600/50" aria-hidden="true"></span>
+        <button id="btn-get" type="button" class="btn rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-zinc-50 disabled:pointer-events-none disabled:opacity-40 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600" disabled>Get Param</button>
+        <button id="btn-set" type="button" class="btn rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-zinc-50 disabled:pointer-events-none disabled:opacity-40 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600" disabled>Set Param</button>
+        <button id="btn-reset" type="button" class="btn rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:pointer-events-none disabled:opacity-40 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300 dark:hover:bg-red-950/50" disabled>Param Reset</button>
+        <span class="mx-1 hidden h-6 w-px shrink-0 bg-black/10 sm:inline-block dark:bg-zinc-600/50" aria-hidden="true"></span>
+        <button id="btn-save" type="button" class="btn rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-zinc-50 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600">Save File</button>
+        <button id="btn-load" type="button" class="btn rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-zinc-50 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600">Load File</button>
+        <input id="file-load" type="file" accept=".json" hidden />
+      </div>
+      <div id="custom-band-row" class="mt-4 hidden flex flex-wrap items-end gap-3 border-t border-black/5 pt-4 dark:border-zinc-600/30">
+        <div class="grid w-28 gap-1.5">
+          <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400" for="custom-freq-base">Base MHz</label>
+          <input id="custom-freq-base" type="number" step="1" value="410" min="1" max="6000" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
         </div>
-        <div class="field narrow">
-          <label for="custom-freq-end">End MHz</label>
-          <input id="custom-freq-end" type="number" step="1" value="493" min="1" max="6000" />
+        <div class="grid w-28 gap-1.5">
+          <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400" for="custom-freq-end">End MHz</label>
+          <input id="custom-freq-end" type="number" step="1" value="493" min="1" max="6000" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
         </div>
-        <p class="muted small custom-band-hint">
+        <p class="min-w-[200px] flex-1 text-[12px] leading-relaxed text-zinc-500 dark:text-zinc-400">
           REG2 is one byte: channel MHz = base + offset (0–255). End is capped to base + 255. Works for any E22‑class module that shares this register map; other families (e.g. E220) need a different tool.
         </p>
       </div>
-      <div class="toolbar-row info-row">
-        <span class="kv"><b>Port:</b> <span id="port-label">—</span></span>
-        <span class="kv"><b>PID:</b>  <span id="pid-label">—</span></span>
-        <span class="kv"><b>Mode:</b> Pin <code>M0=1, M1=1</code> (Configuration)</span>
+      <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 border-t border-black/5 pt-3 text-[13px] text-zinc-600 dark:border-zinc-600/30 dark:text-zinc-400">
+        <span><b class="text-zinc-800 dark:text-zinc-200">Port:</b> <span id="port-label">—</span></span>
+        <span><b class="text-zinc-800 dark:text-zinc-200">PID:</b> <span id="pid-label" class="font-mono text-xs">—</span></span>
+        <span><b class="text-zinc-800 dark:text-zinc-200">Mode:</b> Pin <code class="rounded bg-zinc-200/80 px-1 py-0.5 text-xs dark:bg-zinc-900/55">M0=1, M1=1</code> (Configuration)</span>
       </div>
     </section>
 
-    <!-- ============== Tabs ============== -->
-    <nav class="tabs">
-      <button class="tab tab-active" data-tab="local">Local Configuration</button>
-      <button class="tab"            data-tab="remote">Remote Configuration</button>
-      <button class="tab"            data-tab="download">Download mode</button>
-      <button class="tab"            data-tab="multi">Multi-device terminal</button>
-      <button class="tab"            data-tab="help">Help</button>
+    <!-- Tabs -->
+    <nav class="flex w-fit max-w-full flex-wrap gap-1 rounded-xl border border-black/10 bg-zinc-200/80 p-1 dark:border-zinc-600/45 dark:bg-zinc-900/90">
+      <button type="button" class="tab rounded-lg bg-white px-4 py-2.5 text-[13px] font-medium text-zinc-900 shadow-sm transition dark:bg-zinc-700 dark:text-white dark:ring-1 dark:ring-white/10" data-tab="local">Local Configuration</button>
+      <button type="button" class="tab rounded-lg px-4 py-2.5 text-[13px] font-medium text-zinc-500 transition hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200" data-tab="remote">Remote Configuration</button>
+      <button type="button" class="tab rounded-lg px-4 py-2.5 text-[13px] font-medium text-zinc-500 transition hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200" data-tab="download">Download mode</button>
+      <button type="button" class="tab rounded-lg px-4 py-2.5 text-[13px] font-medium text-zinc-500 transition hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200" data-tab="multi">Multi-device terminal</button>
+      <button type="button" class="tab rounded-lg px-4 py-2.5 text-[13px] font-medium text-zinc-500 transition hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200" data-tab="help">Help</button>
     </nav>
 
-    <main class="main">
-      <!-- ============== TAB: LOCAL ============== -->
-      <section class="card tab-panel" data-panel="local">
-        <h2 class="card-title">Module parameters</h2>
+    <main class="flex flex-col gap-0">
+      <!-- LOCAL -->
+      <section class="tab-panel rounded-[20px] border border-black/10 bg-white/78 p-5 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25 sm:p-6" data-panel="local">
+        <h2 class="mb-1 text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Module parameters</h2>
+        <p id="local-params-hint" class="mb-4 text-[13px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+          Kolom parameter baru bisa diedit setelah <b class="text-zinc-700 dark:text-zinc-300">Get Param</b> berhasil (atau setelah <b class="text-zinc-700 dark:text-zinc-300">Load File</b> untuk preset). Sampai saat itu input dinonaktifkan. Panel status menampilkan frekuensi RF dan <b class="text-zinc-700 dark:text-zinc-300">Parameter (hex)</b> (12 byte seperti RF Setting). Pilih <b class="text-zinc-700 dark:text-zinc-300">Profil label daya</b> agar tegangan dBm di form cocok dengan varian modul / versi RF Setting Anda.
+        </p>
 
-        <div class="grid">
-          <!-- Address group -->
-          <div class="field">
-            <label>Address (16-bit)</label>
-            <div class="addr-row">
-              <input id="addr-hex" type="text" maxlength="4" placeholder="0000" />
-              <span class="hint">hex</span>
-              <input id="addr-dec" type="number" min="0" max="65535" placeholder="0" />
-              <span class="hint">dec</span>
+        <div id="module-status-panel" class="mb-5 rounded-xl border border-blue-500/25 bg-blue-500/[0.06] p-4 shadow-[inset_0_1px_0_rgba(0,113,227,0.08)] dark:border-blue-400/20 dark:bg-blue-500/10 dark:shadow-[inset_0_1px_0_rgba(10,132,255,0.12)]" aria-live="polite">
+          <div class="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Module status</div>
+          <div class="grid gap-3 sm:grid-cols-[minmax(160px,1fr)_minmax(240px,2fr)]">
+            <div class="flex min-w-0 flex-col gap-1">
+              <span class="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">Freq now</span>
+              <span id="module-freq-now" class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">—</span>
             </div>
-          </div>
-          <div class="field">
-            <label>NET ID</label>
-            <input id="netid" type="number" min="0" max="255" value="0" />
-          </div>
-
-          <!-- UART -->
-          <div class="field">
-            <label>UART Baud Rate</label>
-            <select id="uart-baud">
-              <option>1200</option><option>2400</option><option>4800</option>
-              <option selected>9600</option><option>19200</option>
-              <option>38400</option><option>57600</option><option>115200</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Parity</label>
-            <select id="parity">
-              <option value="8N1" selected>8N1</option>
-              <option value="8O1">8O1</option>
-              <option value="8E1">8E1</option>
-            </select>
-          </div>
-
-          <!-- Air -->
-          <div class="field">
-            <label>Air Data Rate</label>
-            <select id="air-baud">
-              <option value="0.3k">0.3k</option>
-              <option value="1.2k">1.2k</option>
-              <option value="2.4k" selected>2.4k</option>
-              <option value="4.8k">4.8k</option>
-              <option value="9.6k">9.6k</option>
-              <option value="19.2k">19.2k</option>
-              <option value="38.4k">38.4k</option>
-              <option value="62.5k">62.5k</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Sub-packet length (B)</label>
-            <select id="sub-packet">
-              <option value="240" selected>240</option>
-              <option value="128">128</option>
-              <option value="64">64</option>
-              <option value="32">32</option>
-            </select>
-          </div>
-
-          <!-- Power & channel -->
-          <div class="field">
-            <label>Transmitting Power (dBm)</label>
-            <select id="power">
-              <option value="30" selected>30</option>
-              <option value="27">27</option>
-              <option value="24">24</option>
-              <option value="21">21</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Channel (<span id="ch-band">410–493</span> MHz)</label>
-            <input id="channel" type="number" value="433" />
-          </div>
-
-          <!-- Modes -->
-          <div class="field">
-            <label>Transmission Mode</label>
-            <select id="tx-mode">
-              <option value="Transparent" selected>Transparent</option>
-              <option value="Fixed">Fixed-point</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>WOR Role</label>
-            <select id="wor-mode">
-              <option value="Receiver" selected>Receiver</option>
-              <option value="Transmitter">Transmitter</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>WOR Cycle (ms)</label>
-            <select id="wor-cycle">
-              <option>500</option><option>1000</option><option>1500</option>
-              <option selected>2000</option><option>2500</option>
-              <option>3000</option><option>3500</option><option>4000</option>
-            </select>
-          </div>
-
-          <div class="field checks">
-            <label>Flags</label>
-            <div class="check-grid">
-              <label class="check"><input type="checkbox" id="rssi-packet" /> Packet RSSI</label>
-              <label class="check"><input type="checkbox" id="ambient" />     Channel RSSI (ambient noise)</label>
-              <label class="check"><input type="checkbox" id="lbt" />         LBT</label>
-              <label class="check"><input type="checkbox" id="repeater" />    Relay (repeater)</label>
-            </div>
-          </div>
-
-          <!-- Crypto key -->
-          <div class="field span-2">
-            <label>Encryption key (16-bit)</label>
-            <div class="addr-row">
-              <input id="key-hex" type="text" maxlength="4" placeholder="0000" />
-              <span class="hint">hex</span>
-              <input id="key-dec" type="number" min="0" max="65535" placeholder="0" />
-              <span class="hint">dec</span>
-              <span class="hint muted">Key is write-only (cannot be read back from the module)</span>
+            <div class="flex min-w-0 flex-col gap-1 sm:col-span-1">
+              <span class="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">Parameter (hex)</span>
+              <span id="module-param-now" class="break-words font-mono text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100">—</span>
             </div>
           </div>
         </div>
+
+        <fieldset id="local-params-fieldset" class="min-w-0 border-0 p-0 disabled:opacity-[0.72]" disabled aria-label="Module register parameters">
+          <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Address (16-bit)</label>
+              <div class="flex flex-wrap items-center gap-2">
+                <input id="addr-hex" type="text" maxlength="4" placeholder="0000" class="min-w-0 flex-1 rounded-[10px] border border-black/12 bg-white px-3 py-2.5 font-mono text-sm dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
+                <span class="text-[11px] text-zinc-400">hex</span>
+                <input id="addr-dec" type="number" min="0" max="65535" placeholder="0" class="w-28 rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
+                <span class="text-[11px] text-zinc-400">dec</span>
+              </div>
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">NET ID</label>
+              <input id="netid" type="number" min="0" max="255" value="0" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">UART Baud Rate</label>
+              <select id="uart-baud" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
+                <option>1200</option><option>2400</option><option>4800</option>
+                <option selected>9600</option><option>19200</option>
+                <option>38400</option><option>57600</option><option>115200</option>
+              </select>
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Parity</label>
+              <select id="parity" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
+                <option value="8N1" selected>8N1</option>
+                <option value="8O1">8O1</option>
+                <option value="8E1">8E1</option>
+              </select>
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Air Data Rate (Kbps)</label>
+              <select id="air-baud" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
+                <option value="0.3k">0.3 Kbps</option>
+                <option value="1.2k">1.2 Kbps</option>
+                <option value="2.4k" selected>2.4 Kbps</option>
+                <option value="4.8k">4.8 Kbps</option>
+                <option value="9.6k">9.6 Kbps</option>
+                <option value="19.2k">19.2 Kbps</option>
+                <option value="38.4k">38.4 Kbps</option>
+                <option value="62.5k">62.5 Kbps</option>
+              </select>
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Sub-packet length (B)</label>
+              <select id="sub-packet" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
+                <option value="240" selected>240</option>
+                <option value="128">128</option>
+                <option value="64">64</option>
+                <option value="32">32</option>
+              </select>
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Transmitting Power (dBm)</label>
+              <select id="power" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100"></select>
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Channel (<span id="ch-band">410–493</span> MHz)</label>
+              <input id="channel" type="number" value="433" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Transmission Mode</label>
+              <select id="tx-mode" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
+                <option value="Transparent" selected>Transparent</option>
+                <option value="Fixed">Fixed-point</option>
+              </select>
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">WOR Role</label>
+              <select id="wor-mode" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
+                <option value="Receiver" selected>Receiver</option>
+                <option value="Transmitter">Transmitter</option>
+              </select>
+            </div>
+            <div class="grid gap-1.5">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">WOR Cycle (ms)</label>
+              <select id="wor-cycle" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100">
+                <option>500</option><option>1000</option><option>1500</option>
+                <option selected>2000</option><option>2500</option>
+                <option>3000</option><option>3500</option><option>4000</option>
+              </select>
+            </div>
+            <div class="grid gap-1.5 sm:col-span-2">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Flags</label>
+              <div class="grid gap-2 sm:grid-cols-2">
+                <label class="flex cursor-pointer items-center gap-2 text-sm text-zinc-800 dark:text-zinc-200"><input type="checkbox" id="rssi-packet" class="rounded border-zinc-300 text-blue-600 dark:border-zinc-600" /> Packet RSSI</label>
+                <label class="flex cursor-pointer items-center gap-2 text-sm text-zinc-800 dark:text-zinc-200"><input type="checkbox" id="ambient" class="rounded border-zinc-300 text-blue-600 dark:border-zinc-600" /> Channel RSSI (ambient noise)</label>
+                <label class="flex cursor-pointer items-center gap-2 text-sm text-zinc-800 dark:text-zinc-200"><input type="checkbox" id="lbt" class="rounded border-zinc-300 text-blue-600 dark:border-zinc-600" /> LBT</label>
+                <label class="flex cursor-pointer items-center gap-2 text-sm text-zinc-800 dark:text-zinc-200"><input type="checkbox" id="repeater" class="rounded border-zinc-300 text-blue-600 dark:border-zinc-600" /> Relay (repeater)</label>
+              </div>
+            </div>
+            <div class="grid gap-1.5 sm:col-span-2">
+              <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Encryption key (16-bit)</label>
+              <div class="flex flex-wrap items-center gap-2">
+                <input id="key-hex" type="text" maxlength="4" placeholder="0000" class="min-w-0 flex-1 rounded-[10px] border border-black/12 bg-white px-3 py-2.5 font-mono text-sm dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
+                <span class="text-[11px] text-zinc-400">hex</span>
+                <input id="key-dec" type="number" min="0" max="65535" placeholder="0" class="w-28 rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
+                <span class="text-[11px] text-zinc-400">dec</span>
+                <span class="text-[11px] text-zinc-400">Key is write-only (cannot be read back from the module)</span>
+              </div>
+            </div>
+          </div>
+        </fieldset>
       </section>
 
-      <!-- ============== TAB: REMOTE ============== -->
-      <section class="card tab-panel hidden" data-panel="remote">
-        <h2 class="card-title">Remote configuration (Fixed-point)</h2>
-        <p class="muted">
-          For remote configuration, the local module must use <b>fixed-point transmission</b>
-          and share the same <b>NET ID</b> as the remote node. Many desktop RF tools forward
-          GET/SET using a proprietary <code>0xCF 0xCF</code> prefix to the target address.
+      <!-- REMOTE -->
+      <section class="tab-panel hidden rounded-[20px] border border-black/10 bg-white/78 p-5 shadow-lg backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25 sm:p-6" data-panel="remote">
+        <h2 class="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">Remote configuration (Fixed-point)</h2>
+        <p class="mb-4 text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          For remote configuration, the local module must use <b class="text-zinc-800 dark:text-zinc-200">fixed-point transmission</b>
+          and share the same <b class="text-zinc-800 dark:text-zinc-200">NET ID</b> as the remote node. Many desktop RF tools forward
+          GET/SET using a proprietary <code class="rounded bg-zinc-200/90 px-1 font-mono text-xs dark:bg-zinc-900/55">0xCF 0xCF</code> prefix to the target address.
         </p>
-        <div class="grid">
-          <div class="field">
-            <label>Target ADDH</label>
-            <input id="r-addh" type="number" min="0" max="255" value="0" />
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="grid gap-1.5">
+            <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Target ADDH</label>
+            <input id="r-addh" type="number" min="0" max="255" value="0" class="rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
           </div>
-          <div class="field">
-            <label>Target ADDL</label>
-            <input id="r-addl" type="number" min="0" max="255" value="0" />
+          <div class="grid gap-1.5">
+            <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Target ADDL</label>
+            <input id="r-addl" type="number" min="0" max="255" value="0" class="rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
           </div>
-          <div class="field">
-            <label>Target Channel</label>
-            <input id="r-channel" type="number" value="433" />
+          <div class="grid gap-1.5">
+            <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Target Channel</label>
+            <input id="r-channel" type="number" value="433" class="rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
           </div>
         </div>
-        <div class="row">
-          <button id="btn-r-get" class="btn" disabled>Remote Get</button>
-          <button id="btn-r-set" class="btn" disabled>Remote Set</button>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button id="btn-r-get" type="button" class="rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600" disabled>Remote Get</button>
+          <button id="btn-r-set" type="button" class="rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600" disabled>Remote Set</button>
         </div>
-        <p class="muted small">
+        <p class="mt-3 text-[12px] leading-relaxed text-zinc-500 dark:text-zinc-400">
           Note: public documentation for remote frames is incomplete for all variants. This tab
-          sends an experimental <code>CF CF C1 …</code> sequence through the open port for
+          sends an experimental <code class="font-mono text-xs">CF CF C1 …</code> sequence through the open port for
           testing via the local module.
         </p>
       </section>
 
-      <!-- ============== TAB: DOWNLOAD ============== -->
-      <section class="card tab-panel hidden" data-panel="download">
-        <h2 class="card-title">Download / Firmware mode</h2>
-        <p class="muted">
+      <!-- DOWNLOAD -->
+      <section class="tab-panel hidden rounded-[20px] border border-black/10 bg-white/78 p-5 shadow-lg backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25 sm:p-6" data-panel="download">
+        <h2 class="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">Download / Firmware mode</h2>
+        <p class="mb-4 text-[14px] text-zinc-600 dark:text-zinc-400">
           Desktop “Download” mode is often used to push firmware to a companion MCU (e.g. E22-DTU).
           Use this tab to send raw bytes for link testing.
         </p>
-        <div class="grid">
-          <div class="field span-2">
-            <label>Bytes (hex, space-separated)</label>
-            <input id="raw-bytes" type="text" placeholder="C1 00 09" />
+        <div class="grid gap-4">
+          <div class="grid gap-1.5 sm:col-span-2">
+            <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Bytes (hex, space-separated)</label>
+            <input id="raw-bytes" type="text" placeholder="C1 00 09" class="w-full rounded-[10px] border border-black/12 bg-white px-3 py-2.5 font-mono text-sm dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
           </div>
         </div>
-        <div class="row">
-          <button id="btn-raw-send" class="btn" disabled>Send Raw</button>
+        <div class="mt-4">
+          <button id="btn-raw-send" type="button" class="rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-500/40 dark:bg-zinc-700/90 dark:text-zinc-100 dark:hover:bg-zinc-600" disabled>Send Raw</button>
         </div>
       </section>
 
-      <!-- ============== TAB: MULTI-DEVICE TERMINAL ============== -->
-      <section class="card tab-panel hidden" data-panel="multi">
-        <h2 class="card-title">Multi-device UART terminal</h2>
-        <p class="muted">
+      <!-- MULTI -->
+      <section class="tab-panel hidden rounded-[20px] border border-black/10 bg-white/78 p-5 shadow-lg backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25 sm:p-6" data-panel="multi">
+        <h2 class="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">Multi-device UART terminal</h2>
+        <p class="mb-4 text-[14px] text-zinc-600 dark:text-zinc-400">
           Choose how many USB-serial terminals you need, then create the panels. Each slot has its own baud rate,
-          RX log, and send line. Put each E22 in <b>transparent mode</b> (<code>M0=0</code>, <code>M1=0</code>) for over-the-air UART pass-through.
+          RX log, and send line. Put each E22 in <b class="text-zinc-800 dark:text-zinc-200">transparent mode</b> (<code class="rounded bg-zinc-200/90 px-1 font-mono text-xs dark:bg-zinc-900/55">M0=0</code>, <code class="rounded bg-zinc-200/90 px-1 font-mono text-xs dark:bg-zinc-900/55">M1=0</code>) for over-the-air UART pass-through.
           This tab is independent from the configuration toolbar above.
         </p>
-        <div class="multi-setup">
-          <div class="field narrow">
-            <label for="multi-count">Number of devices</label>
-            <input type="number" id="multi-count" min="1" max="6" value="2" />
+        <div class="mb-4 flex flex-wrap items-end gap-3">
+          <div class="grid w-28 gap-1.5">
+            <label class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400" for="multi-count">Number of devices</label>
+            <input type="number" id="multi-count" min="1" max="6" value="2" class="rounded-[10px] border border-black/12 bg-white px-3 py-2.5 dark:border-zinc-500/35 dark:bg-zinc-900/55 dark:text-zinc-100" />
           </div>
-          <button type="button" class="btn btn-primary" id="multi-create">Create panels</button>
-          <p class="muted small multi-setup-hint">You can recreate panels anytime; open ports in this tab will be closed first.</p>
+          <button type="button" id="multi-create" class="rounded-xl border border-blue-600 bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 dark:border-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500">Create panels</button>
+          <p class="min-w-[200px] flex-1 text-[12px] text-zinc-500 dark:text-zinc-400">You can recreate panels anytime; open ports in this tab will be closed first.</p>
         </div>
-        <div id="multi-slots" class="multi-slots multi-slots-empty">
-          <p class="muted multi-empty-hint" id="multi-empty-hint">
-            No panels yet. Set the number of devices and click <b>Create panels</b>.
+        <div id="multi-slots" class="multi-slots-empty flex min-h-[120px] flex-col flex-wrap content-center items-center justify-center gap-4 rounded-xl border border-dashed border-zinc-300/80 bg-zinc-50/50 p-4 dark:border-zinc-500/45 dark:bg-zinc-900/45">
+          <p id="multi-empty-hint" class="max-w-md text-center text-[13px] text-zinc-500 dark:text-zinc-400">
+            No panels yet. Set the number of devices and click <b class="text-zinc-700 dark:text-zinc-300">Create panels</b>.
           </p>
         </div>
       </section>
 
-      <!-- ============== TAB: HELP ============== -->
-      <section class="card tab-panel hidden" data-panel="help">
-        <h2 class="card-title">How to use</h2>
-        <ol class="help-list">
+      <!-- HELP -->
+      <section class="tab-panel hidden rounded-[20px] border border-black/10 bg-white/78 p-5 shadow-lg backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25 sm:p-6" data-panel="help">
+        <h2 class="mb-3 text-lg font-semibold text-zinc-900 dark:text-zinc-100">How to use</h2>
+        <ol class="list-decimal space-y-2 pl-5 text-[14px] leading-relaxed text-zinc-700 dark:text-zinc-300">
           <li>Open this app in <b>Chrome</b>, <b>Edge</b>, or <b>Opera</b> (Web Serial API).</li>
-          <li>Set the <b>E22</b> module to configuration mode: <code>M0=1</code>, <code>M1=1</code>.</li>
-          <li>Select the <b>Band / channel map</b> preset (or <b>Custom MHz</b>), click <b>Open Port</b>, and choose your USB-Serial device.</li>
+          <li>Set the <b>E22</b> module to configuration mode: <code class="rounded bg-zinc-200/90 px-1 font-mono text-xs dark:bg-zinc-900/55">M0=1</code>, <code class="rounded bg-zinc-200/90 px-1 font-mono text-xs dark:bg-zinc-900/55">M1=1</code>.</li>
+          <li>Select the <b>Band / channel map</b> preset (or <b>Custom MHz</b>), <b>Profil label daya</b> if your RF Setting shows 22/17/13/10 dBm instead of 30/27/24/21, then <b>Open Port</b> and choose your USB-Serial device.</li>
           <li>Click <b>Get Param</b> to read the active register map into the form.</li>
           <li>Edit fields as needed, then <b>Set Param</b> to write permanently to flash.</li>
-          <li>When finished, return jumpers to normal mode (<code>M0=0, M1=0</code>) before using the radio on-air.</li>
+          <li>When finished, return jumpers to normal mode (<code class="rounded bg-zinc-200/90 px-1 font-mono text-xs dark:bg-zinc-900/55">M0=0, M1=0</code>) before using the radio on-air.</li>
         </ol>
-        <h3>Protocol frames</h3>
-        <ul class="help-list">
-          <li><code>C1 00 09</code> — Get Param (9 register)</li>
-          <li><code>C0 00 09 [9 byte data]</code> — Set Param (permanent)</li>
-          <li><code>C2 00 09 [9 byte data]</code> — Set Param (volatile)</li>
-          <li><code>C1 80 07</code> — Get Product Information (PID)</li>
+        <h3 class="mb-2 mt-6 text-base font-semibold text-zinc-900 dark:text-zinc-100">Protocol frames</h3>
+        <ul class="list-disc space-y-1.5 pl-5 text-[14px] text-zinc-700 dark:text-zinc-300">
+          <li><code class="font-mono text-xs">C1 00 09</code> — Get Param (9 register)</li>
+          <li><code class="font-mono text-xs">C0 00 09 [9 byte data]</code> — Set Param (permanent)</li>
+          <li><code class="font-mono text-xs">C2 00 09 [9 byte data]</code> — Set Param (volatile)</li>
+          <li><code class="font-mono text-xs">C1 80 07</code> — Get Product Information (raw PID bytes; toolbar only — not ASCII model name)</li>
         </ul>
-        <h3>Multi-device terminal</h3>
-        <p class="muted small">
-          Use the <b>Multi-device terminal</b> tab: set the device count, click <b>Create panels</b>, then connect each USB‑serial adapter in its slot.
+        <h3 class="mb-2 mt-6 text-base font-semibold text-zinc-900 dark:text-zinc-100">Multi-device terminal</h3>
+        <p class="text-[12px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+          Use the <b class="text-zinc-700 dark:text-zinc-300">Multi-device terminal</b> tab: set the device count, click <b>Create panels</b>, then connect each USB‑serial adapter in its slot.
           Match baud to the module’s UART. Use <b>Send as hex</b> for raw frames; otherwise text is UTF‑8 (optional LF).
         </p>
       </section>
     </main>
 
-    <!-- ============== Activity log ============== -->
-    <section class="card log-card">
-      <div class="log-header">
-        <h3>Activity log</h3>
-        <div class="log-actions">
-          <button id="btn-clear-log" class="btn btn-ghost">Clear</button>
-        </div>
+    <!-- Log -->
+    <section class="rounded-[20px] border border-black/10 bg-white/78 shadow-lg backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-4 py-3 dark:border-zinc-600/40 sm:px-5">
+        <h3 class="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100">Activity log</h3>
+        <button id="btn-clear-log" type="button" class="rounded-lg border border-transparent px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/40">Clear</button>
       </div>
-      <pre id="log" class="log"></pre>
+      <pre id="log" class="max-h-[min(52vh,420px)] overflow-auto whitespace-pre-wrap break-words bg-zinc-50/80 p-4 font-mono text-[12px] leading-relaxed text-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-200 sm:p-5"></pre>
     </section>
 
-    <!-- ============== Dukungan (Saweria + Cointree) ============== -->
-    <aside class="card support-card" aria-label="Support the project">
-      <div class="support-inner">
-        <div class="support-copy">
-          <h3 class="support-heading">Support</h3>
-          <p class="support-desc">
+    <!-- Support -->
+    <aside class="rounded-[20px] border border-black/10 bg-white/78 p-5 shadow-lg backdrop-blur-xl dark:border-zinc-600/50 dark:bg-zinc-800/95 dark:shadow-xl dark:shadow-black/25 sm:p-6" aria-label="Support the project">
+      <div class="flex flex-row flex-wrap items-center justify-between gap-6">
+        <div class="min-w-[min(100%,240px)] flex-1">
+          <h3 class="mb-2 text-[19px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Support</h3>
+          <p class="mb-3.5 text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400">
             If this tool saved you time, consider tipping via Saweria (QR) or the Cointree link below—thank you.
           </p>
           <a
-            class="btn btn-primary support-cta"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-600 bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 dark:border-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500"
             href="https://cointr.ee/ndawinata"
             target="_blank"
             rel="noopener noreferrer"
-          >Open Cointree</a>
-          <p class="support-link-hint muted small">cointr.ee/ndawinata</p>
-          <p class="support-contact">
-            <a href="mailto:nandawinata@gmail.com">nandawinata@gmail.com</a>
-            <span class="support-contact-sub">Questions or feedback welcome.</span>
+          >
+            <img class="h-[22px] w-[22px] shrink-0 object-contain" src="img/cointree.png" width="22" height="22" alt="" decoding="async" />
+            Open Cointree
+          </a>
+          <p class="mt-2 font-mono text-[12px] text-zinc-500 dark:text-zinc-400">cointr.ee/ndawinata</p>
+          <p class="mt-3.5 text-[12px] leading-snug text-zinc-600 dark:text-zinc-400">
+            <a class="font-medium text-blue-600 no-underline hover:underline dark:text-blue-400" href="mailto:nandawinata@gmail.com">nandawinata@gmail.com</a>
+            <span class="mt-0.5 block text-[11px] text-zinc-400 dark:text-zinc-500">Questions or feedback welcome.</span>
           </p>
         </div>
-        <div class="support-qr-block">
-          <img
-            class="support-qr"
-            src="img/saweria.png"
-            width="160"
-            alt="QR Saweria"
-            loading="lazy"
-            decoding="async"
-          />
-          <span class="support-qr-label">Saweria</span>
+        <div class="ml-auto flex shrink-0 flex-col items-center gap-2">
+          <img class="block max-w-[min(200px,42vw)] rounded-2xl border border-black/12 bg-white p-2 shadow-lg dark:border-zinc-500/40" src="img/saweria.png" width="160" alt="QR Saweria" loading="lazy" decoding="async" />
+          <span class="text-[12px] font-semibold text-zinc-500 dark:text-zinc-400">Saweria</span>
         </div>
       </div>
     </aside>
 
-    <footer class="site-footer">
-      <a class="site-footer-mail" href="mailto:nandawinata@gmail.com">nandawinata@gmail.com</a>
-      <span class="site-footer-sep">·</span>
-      <a class="site-footer-license" href="LICENSE" rel="license">Apache License 2.0</a>
+    <footer class="flex flex-wrap items-center justify-center gap-2 px-2 pb-2 pt-3.5 text-[11px] text-zinc-400 dark:text-zinc-500">
+      <a class="text-zinc-500 no-underline hover:text-blue-600 hover:underline dark:text-zinc-400 dark:hover:text-blue-400" href="mailto:nandawinata@gmail.com">nandawinata@gmail.com</a>
+      <span class="select-none opacity-55">·</span>
+      <a class="text-zinc-500 no-underline hover:text-blue-600 hover:underline dark:text-zinc-400 dark:hover:text-blue-400" href="LICENSE" rel="license">Apache License 2.0</a>
     </footer>
   </div>
 
